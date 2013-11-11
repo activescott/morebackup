@@ -1,10 +1,8 @@
-more-backup
+morebackup
 ===========
-
 Handy scripts for backups.
 
-Suggestions/issues and pull requests are welcomed!
-
+[Suggestions/issues](https://github.com/activescott/morebackup/issues) and pull requests are welcome!
 
 sync-machine.sh
 -----------
