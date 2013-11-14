@@ -101,6 +101,19 @@ logbegin "\n**************************************************\nBackup begining 
 #NOTE: two v options (-vv) shows detailed exclude/include information.
 # -C (cvs exclude) excludes dumb things but also USEFUL things like .exe files! So don't use that!
 # -E (extended attributes) is necessary on macs to make things like packages work and special folders - and I'm sure other things that I don't know about).
+# -a, --archive               archive mode; same as -rlptgoD (no -H)
+# -x, --one-file-system       don't cross filesystem boundaries
+# -h, --human-readable		  Output numbers in a more human-readable format.  This makes  big numbers output using larger units, with a K, M, or G suffix.  If this option was specified once, these  units  are  K  (1000),  M
+
+# -r, --recursive
+# -l, --links                 copy symlinks as symlinks
+# -p, --perms                 preserve permissions
+# -t, --times                 preserve times
+# -g, --group 		          This  option  causes  rsync  to set the group of the destination file to be the same as the source file.  If the  receiving  program  is  not  running  as  the super-user (or if --no-super was...
+# -o, --owner                 preserve owner (super-user only)
+# -D                          same as --devices --specials
+#  --devices                  preserve device files (super-user only)
+#  --specials                 preserve special files
 
 # --stats provides a nice summary at the end without listing every file like -v or -vv
 OPTIONS='-aExh --stats --delete --delete-excluded --exclude "*.sparsebundle/"'
@@ -133,7 +146,8 @@ logend "Running rsync complete at `date`."
 # Note: it is important do only do the follow stuff if everything succeeds (i.e. directories exist), otherwise it can screw up future backups since they depend on the 'Latest' link being accurate.
 log "Removing inprogress postifx"
 if [ -d "$DEST.inprogress" ]; then
-	mv $DEST.inprogress $DEST
+	#NOTE: I've seen this fail due to ACLs in OSX. Removing ACLs from the directory attempting to be renamed with `chmod -N` worked.
+	mv $DEST.inprogress $DEST || die "Failed to remove inprogress postfix. Stopping!"
 else
 	log "$DEST.inprogress didn't exist, so not removing .inprogress postfix."
 fi
@@ -141,7 +155,7 @@ fi
 log "updating latest link"
 if [ -d "$DEST" ]; then
 	rm -f $DESTROOT/Latest
-	ln -s $DEST $DESTROOT/Latest
+	ln -s $DEST $DESTROOT/Latest || die "Failed to create Latest entry!"
 else
 	log "Latest link not updated since directory '$DEST' does not exist!"
 fi
