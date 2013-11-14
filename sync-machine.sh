@@ -69,9 +69,6 @@ shift $((OPTIND-1))
 
 [ $1 ] || die 'SOURCE was not specified!'
 [ $2 ] || die 'DEST was not specified!'
-
-
-exit 0;
 ##### /PARSE ARGUMENTS #####
 
 DATE=`date "+%Y-%m-%dT%H_%M_%S"`
