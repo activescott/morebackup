@@ -8,6 +8,6 @@ do
 	if [ $f != "deploy.sh" ]; then
 		#delete the existing link if it exists
 		[ -a "$BIN/$f" ] && rm -f "$BIN/$f" 
-		ln "$HERE/$f" "$BIN/$f"
+		ln -s "$HERE/$f" "$BIN/$f"
 	fi
 done
