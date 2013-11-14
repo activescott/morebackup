@@ -6,7 +6,7 @@
 # There is always a Latest symlink to the time stampped directory containing the most recent backup.
 # Each new backup uses symlinks to the prior backup directory so that any files that were not changed since the most recent backup are not re-copied.
 ##########
-_show_help() {
+show_help() {
 	echo "Usage: sync-machine.sh [OPTIONS] SRC [DEST]"
 	echo "SRC: A source path/host specifier that is compatible with the rsync command's SRC argument." 
 	echo "     SRC could be a local path or a remote SSH path like user@host:/path/to/something or an rsync protocol like rsync://[USER@]HOST[:PORT]/path ."
@@ -17,7 +17,7 @@ _show_help() {
 	echo "    -v     Verbose output during transfer (every file listed)."
 }
 
-_die () {
+die () {
 	show_help
     echo >&2 "$@"
     exit 1
@@ -26,7 +26,7 @@ _die () {
 ########## Functions & Aliases ##########
 ##### These provide some indented logging with timestamps #####
 LOGNESTING=0
-_log() {
+log() {
 	for (( c=0; c < $LOGNESTING; c++ ))
 	do
 		printf '  '
@@ -34,13 +34,13 @@ _log() {
 	timestamptemp=`date "+%m/%d/%y %H:%M:%S"`
 	echo $timestamptemp $1
 }
-_logbegin() {
-	_log "$1"
+logbegin() {
+	log "$1"
 	let LOGNESTING++
 }
-_logend(){
+logend(){
 	let LOGNESTING--
-	_log "$1"
+	log "$1"
 }
 ########## /Functions & Aliases ##########
 
@@ -67,7 +67,11 @@ shift $((OPTIND-1))
 # if the first non-OPTIONS argument is -- skip it (why would this happen again?).
 [ "$1" = "--" ] && shift
 
-[ $1 ] || die 'source variable is unset or empty!'
+[ $1 ] || die 'SOURCE was not specified!'
+[ $2 ] || die 'DEST was not specified!'
+
+
+exit 0;
 ##### /PARSE ARGUMENTS #####
 
 DATE=`date "+%Y-%m-%dT%H_%M_%S"`
@@ -81,7 +85,7 @@ fi
 [ -d $DESTROOT ] || mkdir -pv $DESTROOT
 # NOTE: ln & rsync seem to require a fully qualified path, relative path won't work. This is a trick to get qulified path:
 DESTROOT_QUALIFIED=$(cd $DESTROOT; pwd);
-_log "Expanded \"$DESTROOT\" to \"$DESTROOT_QUALIFIED\"."
+log "Expanded \"$DESTROOT\" to \"$DESTROOT_QUALIFIED\"."
 DESTROOT=$DESTROOT_QUALIFIED
 DEST=$DESTROOT/$DATE
 
@@ -94,7 +98,7 @@ DEST=$DESTROOT/$DATE
 SRC=$1
 #####
 
-_logbegin "\n**************************************************\nBackup begining at `date`..."
+logbegin "\n**************************************************\nBackup begining at `date`..."
 
 ##### RSYNC OPTIONS #####
 #NOTE: two v options (-vv) shows detailed exclude/include information.
@@ -119,37 +123,37 @@ fi
 #####
 
 ##### RUN RSYNC #####
-_logbegin "Running rsync with options \"$OPTIONS\" source=\"$SRC\" destination=\"$DEST\"..."
+logbegin "Running rsync with options \"$OPTIONS\" source=\"$SRC\" destination=\"$DEST\"..."
 
 rsync $OPTIONS \
 $SRC \
 $DEST.inprogress/
 
-_logend "Running rsync complete at `date`."
+logend "Running rsync complete at `date`."
 ##### /RUN RSYNC #####
 
 ##### CLEANUP #####
 # Note: it is important do only do the follow stuff if everything succeeds (i.e. directories exist), otherwise it can screw up future backups since they depend on the 'Latest' link being accurate.
-_log "Removing inprogress postifx"
+log "Removing inprogress postifx"
 if [ -d "$DEST.inprogress" ]; then
 	mv $DEST.inprogress $DEST
 else
-	_log "$DEST.inprogress didn't exist, so not removing .inprogress postfix."
+	log "$DEST.inprogress didn't exist, so not removing .inprogress postfix."
 fi
 
-_log "updating latest link"
+log "updating latest link"
 if [ -d "$DEST" ]; then
 	rm -f $DESTROOT/Latest
 	ln -s $DEST $DESTROOT/Latest
 else
-	_log "Latest link not updated since directory '$DEST' does not exist!"
+	log "Latest link not updated since directory '$DEST' does not exist!"
 fi
 ##### /CLEANUP #####
 
 ##### Diagnostic Output ##### 
-_logbegin "Displaying file counts for recent backups for comparison (this can help detect errors in backup if recent file counts vary widely):"
+logbegin "Displaying file counts for recent backups for comparison (this can help detect errors in backup if recent file counts vary widely):"
 for D in `find -HL $DESTROOT -newerct '2 weeks ago' -maxdepth 1`; do echo $D: `find -HL $D | wc -l`; done
-_logend "Displaying file counts complete."
+logend "Displaying file counts complete."
 ##### /Diagnostic Output ##### 
 
-_logend "Backup complete at: $DEST"
+logend "Backup complete at: $DEST"
