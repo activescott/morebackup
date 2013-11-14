@@ -18,8 +18,15 @@ Some notable features/benefits of this technique:
 - SSH and rsync protocol is supported since rsync supports it.
 - I love rsync, but sometimes it's hard to get the options just right. This scripts memorializes the best options I know of for backups.
 
+### Examples
+
+The below example would backup the `/Users/mranderson` directory to `/Volumes/MyExternalDrive/Backups`. Time-stamped directories like `2013-11-14T05_56_07` would be in the Backups folder for each of the backups (i.e. each time the sync-machine.sh script is run):
+
+	sync-machine.sh /Users/mranderson /Volumes/MyExternalDrive/Backups
+
 *Compatibility*: I've only used it on OSX, but it should work on linux and windows+cygwin with no or minor modifications. 
+
 
 backup-mysql.sh
 -----------
-Uses SSH to do a basic MySQL backup. This should work well for many cheap website hosts that use tools that have a database on them.
+Uses SSH to backup a MySQL database on a remote machine. This should work well for many website hosts that host applications that have a database such as the various content management systems.
