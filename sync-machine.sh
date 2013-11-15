@@ -31,10 +31,15 @@ log() {
 	do
 		printf '  '
 	done
-	timestamptemp=`date "+%m/%d/%y %H:%M:%S"`
-	echo $timestamptemp $1
+	if [[ $1 ]]; then
+		timestamptemp=`date "+%m/%d/%y %H:%M:%S"`
+		printf "$timestamptemp $1\n"
+	else
+		printf "\n"
+	fi
 }
 logbegin() {
+	log ""
 	log "$1"
 	let LOGNESTING++
 }
@@ -133,12 +138,16 @@ fi
 #####
 
 ##### RUN RSYNC #####
-logbegin "Running rsync with options \"$OPTIONS\" source=\"$SRC\" destination=\"$DEST\"..."
+logbegin "Running rsync with the following options:"
+log "Options=\"$OPTIONS\""
+log "Source=\"$SRC\""
+log "Destination=\"$DEST\"..."
 
 rsync $OPTIONS \
 $SRC \
 $DEST.inprogress/
 
+log ""
 logend "Running rsync complete at `date`."
 ##### /RUN RSYNC #####
 
