@@ -6,7 +6,7 @@
 
 
 show_help () {
-	echo "Usage: backup-mysql.sh -h HOST -u USERNAME -p MYSQL_PASSWORD DBNAME [DESTDIR]"
+	echo "Usage: backup-mysql.sh -h HOST -u USERNAME -p MYSQL_PASSWORD DBNAME DESTDIR"
 	echo " HOST           The hostname to SSH into to backup mysql."
 	echo " USERNAME       The username to use on the SSH host and with the mysqldump command."
 	echo " MYSQL_PASSWORD The password with the mysqldump command."
@@ -60,14 +60,18 @@ BACKUPFILENAME="_mysqldump_$DBNAME.sql"
 BACKUPFILENAME=$DATESTAMP$BACKUPFILENAME
 
 # Display message to user with what we understood as arguments:
-MSG="Backing up MySQL database '$DBNAME' from '$THEUSER@$THEHOST'"
-[ -z $DESTDIR ] ||  MSG="$MSG to '$BACKUPFILENAME'"
-echo "$MSG..."
+echo "Backing up MySQL database '$DBNAME' from '$THEUSER@$THEHOST' to $DESTDIR"
 
 [ $THEHOST ] || die 'HOST must be specified!'
 [ $DBNAME ] || die 'DBNAME must be specified!'
 [ $THEUSER ] || die 'USERNAME must be specified!'
 [ $MYSQL_PASSWORD ] || die 'MYSQL_PASSWORD must be specified!'
+[ $DESTDIR ] || die 'DESTDIR must be specified!'
+
+#expand the DESTDIR argument to a fully qualified path:
+DESTDIR_QUALIFIED=$(cd $DESTDIR; pwd;)
+echo "Expanded \"$DESTDIR\" to \"$DESTDIR_QUALIFIED\""
+DESTDIR=$DESTDIR_QUALIFIED
 ##### /PARSE ARGUMENTS #####
 
 
@@ -75,6 +79,12 @@ echo -e "**********"
 echo -e "Performing mysqldump backup via ssh...\n"
 ssh $THEUSER@$THEHOST "mysqldump -u $THEUSER -p$MYSQL_PASSWORD $DBNAME" > $DESTDIR/$BACKUPFILENAME 
 echo -e "Performing mysqldump backup via ssh COMPLETE."
+
+LATEST="$DESTDIR/Latest.sql"
+[ -L $LATEST ] && rm -fv $LATEST
+ln -sv $DESTDIR/$BACKUPFILENAME $LATEST
+
+
 
 echo -e "**********"
 echo -e "First part of the backed up file is below:"

@@ -19,8 +19,8 @@ show_help() {
 
 die () {
 	show_help
-    echo >&2 "$@"
-    exit 1
+	echo >&2 "$@"
+	exit 1
 }
 
 ########## Functions & Aliases ##########
