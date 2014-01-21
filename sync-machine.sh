@@ -19,7 +19,7 @@ show_help() {
 
 die () {
 	show_help
-	echo >&2 "$@"
+	echo >&2 "$@" #TODO: should probably use printf instead of echo to support newlines. Need to test.
 	exit 1
 }
 
@@ -72,8 +72,8 @@ shift $((OPTIND-1))
 # if the first non-OPTIONS argument is -- skip it (why would this happen again?).
 [ "$1" = "--" ] && shift
 
-[ $1 ] || die 'SOURCE was not specified!'
-[ $2 ] || die 'DEST was not specified!'
+[[ $1 ]] || die 'SOURCE was not specified!' # These have to be bash [[ ]] expressions when special characters like ~ are used in the path specifier. Otherwise I got a "binary operator expected" error.
+[[ $2 ]] || die 'DEST was not specified!'
 ##### /PARSE ARGUMENTS #####
 
 DATE=`date "+%Y-%m-%dT%H_%M_%S"`
