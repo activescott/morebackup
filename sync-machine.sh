@@ -72,8 +72,8 @@ shift $((OPTIND-1))
 # if the first non-OPTIONS argument is -- skip it (why would this happen again?).
 [ "$1" = "--" ] && shift
 
-[ $1 ] || die 'SOURCE was not specified!'
-[ $2 ] || die 'DEST was not specified!'
+[ "$1" ] || die 'SOURCE was not specified!'
+[ "$2" ] || die 'DEST was not specified!'
 ##### /PARSE ARGUMENTS #####
 
 DATE=`date "+%Y-%m-%dT%H_%M_%S"`
@@ -84,12 +84,13 @@ else
 	DESTROOT=./
 fi
 # create DESTROOT if it doesn't exist (this part works fine with relative paths)
-[ -d $DESTROOT ] || mkdir -pv $DESTROOT
-# NOTE: ln & rsync seem to require a fully qualified path, relative path won't work. This is a trick to get qulified path:
+[ -d "$DESTROOT" ] || mkdir -pv "$DESTROOT" || die "Could not create directory $DESTROOT"
+
+# NOTE: ln & rsync seem to require a fully qualified path, relative path won't work. This is a trick to get qualified path:
 DESTROOT_QUALIFIED=$(cd $DESTROOT; pwd);
 log "Expanded \"$DESTROOT\" to \"$DESTROOT_QUALIFIED\"."
 DESTROOT=$DESTROOT_QUALIFIED
-DEST=$DESTROOT/$DATE
+DEST="$DESTROOT/$DATE"
 
 ##### /DEST #####
 
@@ -144,8 +145,8 @@ log "Source=\"$SRC\""
 log "Destination=\"$DEST\"..."
 
 rsync $OPTIONS \
-$SRC \
-$DEST.inprogress/
+"$SRC" \
+"$DEST.inprogress/"
 
 log ""
 logend "Running rsync complete at `date`."
@@ -156,7 +157,7 @@ logend "Running rsync complete at `date`."
 log "Removing inprogress postifx"
 if [ -d "$DEST.inprogress" ]; then
 	#NOTE: I've seen this fail due to ACLs in OSX. Removing ACLs from the directory attempting to be renamed with `chmod -N` worked.
-	mv $DEST.inprogress $DEST || die "Failed to remove inprogress postfix. Stopping!"
+	mv "$DEST.inprogress" "$DEST" || die "Failed to remove inprogress postfix. Stopping!"
 else
 	log "$DEST.inprogress didn't exist, so not removing .inprogress postfix."
 fi
