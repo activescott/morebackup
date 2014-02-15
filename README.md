@@ -29,4 +29,4 @@ The below example would backup the `/Users/mranderson` directory to `/Volumes/My
 
 backup-mysql.sh
 -----------
-Uses SSH to backup a MySQL database on a remote machine. This should work well for many website hosts that host applications that have a database such as the various content management systems.
+Uses SSH to create a local backup of a remote MySQL database. This is ideal for website hosts that host applications that have a database such as the various content management systems (joomla, wordpress, etc.).
