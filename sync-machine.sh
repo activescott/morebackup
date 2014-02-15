@@ -173,7 +173,7 @@ fi
 
 ##### Diagnostic Output ##### 
 logbegin "Displaying file counts for recent backups for comparison (this can help detect errors in backup if recent file counts vary widely):"
-for D in `find -HL $DESTROOT -newerct '2 weeks ago' -maxdepth 1`; do echo $D: `find -HL $D | wc -l`; done
+for D in `find -H -L $DESTROOT -newerct '2 weeks ago' -maxdepth 1`; do echo $D: `find -HL $D | wc -l`; done
 logend "Displaying file counts complete."
 ##### /Diagnostic Output ##### 
 
