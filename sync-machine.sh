@@ -122,7 +122,7 @@ logbegin "\n**************************************************\nBackup begining 
 #  --specials                 preserve special files
 
 # --stats provides a nice summary at the end without listing every file like -v or -vv
-OPTIONS='-aExh --stats --delete --delete-excluded --exclude "*.sparsebundle/"'
+OPTIONS='-aExh --stats --delete --delete-excluded --exclude=*.sparsebundle/ --exclude=**/lost+found'
 # link-dest is the key to make sure backups are fast and effecieint with space. However, rsync spits an error message out (although it continues succesfully) if it doesn't exist. Lets prevent the error message:
 if [ -d $DESTROOT/Latest ]; then
 	OPTIONS="--link-dest $DESTROOT/Latest $OPTIONS"
