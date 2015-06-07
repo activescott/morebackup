@@ -8,8 +8,8 @@ sync-machine.sh
 -----------
 Uses strategy like Apple's Time Machine to perform incremental backups. It makes backups very fast and storage of them very small. Basically it works as follows:
 * Each backup is basically a copy of the files from the source directory into a directory named with a date+time stamp.
-* There is always a `Latest` directory symlinked to the time-stamped directory containing the most recent backup.
-* Each new backup uses symlinks to the files & folders in the prior backup directory so that **any files that were not changed since the most recent backup are not stored again**, resulting in effecient storage.
+* There is always a `Latest` directory hard-linked to the time-stamped directory containing the most recent backup.
+* Each new backup uses hard-links to the files & folders in the prior backup directory so that **any files that were not changed since the most recent backup are not stored again**, resulting in effecient storage.
 * It uses an rsync for copying files which results in only copying things that have changed since the last backup.
 
 Some notable features/benefits of this technique: 
